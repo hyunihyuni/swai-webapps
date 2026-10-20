@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>요망진 AI와 제주지키기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" media="print" onload="this.media='all'">
+<style>
+/* 레이아웃: 위 제목·진행바 → 가운데 8x7 글자판 → 아래 찾은 단어 카드. 넓은 화면은 판과 카드가 좌우 2단 */
+:root{
+  --sea:#1f6fb2;      /* 제주 바다 */
+  --sea-soft:#dcebf7;
+  --tangerine:#f28c1e;/* 감귤 */
+  --basalt:#2f3437;   /* 현무암 */
+  --bg:#f3f7fa;
+  --card:#ffffff;
+  --line:#c9d9e6;
+  --muted:#5d6b76;
+  --fg:#1d2a33;
+  --ok:#2f9e5b;
+  --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --sea:#6bb3ec;--sea-soft:#1b3346;--tangerine:#ffa648;--basalt:#e8eef2;
+  --bg:#11181d;--card:#1a242b;--line:#2d3d49;--muted:#9aaab6;--fg:#e8eef2;--ok:#5fcf8a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sea:#6bb3ec;--sea-soft:#1b3346;--tangerine:#ffa648;--basalt:#e8eef2;
+  --bg:#11181d;--card:#1a242b;--line:#2d3d49;--muted:#9aaab6;--fg:#e8eef2;--ok:#5fcf8a;color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.eyebrow{font-size:14px;color:var(--muted);letter-spacing:.04em}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(26px,5vw,38px);margin:2px 0 0;line-height:1.15;text-wrap:balance;color:var(--sea)}
+h1 b{color:var(--tangerine);font-weight:400}
+.score{font-family:var(--display);font-size:22px;display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:5px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--line);transition:background .3s,transform .3s}
+.dot.on{background:var(--tangerine);transform:scale(1.15)}
+.guide{background:var(--sea-soft);border-radius:14px;padding:10px 14px;font-size:15px;line-height:1.5}
+.main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.main{grid-template-columns:1fr}}
+
+.boardbox{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px}
+.board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;touch-action:none;user-select:none;-webkit-user-select:none}
+.cell{aspect-ratio:1;max-width:100%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:clamp(20px,5.2vw,32px);color:var(--sea);
+  background:var(--bg);border-radius:10px;cursor:pointer;min-height:44px;transition:background .15s,color .15s,transform .15s}
+.cell.sel{background:var(--tangerine);color:#fff;transform:scale(1.06)}
+.cell.tap{outline:3px dashed var(--tangerine);outline-offset:-3px}
+.cell.found{color:#fff}
+.cell.hint{animation:blink 1s ease-in-out 3}
+@keyframes blink{50%{background:var(--tangerine);color:#fff}}
+.cell.wrong{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.cell:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+
+.tools{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+button{font-family:var(--display);font-size:18px;min-height:46px;padding:0 18px;border-radius:12px;border:2px solid var(--sea);
+  background:var(--card);color:var(--sea);cursor:pointer}
+button.primary{background:var(--sea);color:var(--card)}
+button:focus-visible{outline:3px solid var(--tangerine);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+
+.side h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 10px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:420px){.cards{grid-template-columns:1fr}}
+.wc{background:var(--card);border:2px dashed var(--line);border-radius:14px;padding:10px 12px;min-height:84px;display:flex;flex-direction:column;gap:4px}
+.wc .w{font-family:var(--display);font-size:20px;letter-spacing:.06em;color:var(--muted)}
+.wc .d{font-size:14px;line-height:1.45;color:var(--muted)}
+.wc.done{border-style:solid;border-color:var(--c)}
+.wc.done .w{color:var(--c);letter-spacing:0}
+.wc.done .d{color:var(--fg)}
+.wc.pop{animation:pop .45s}
+@keyframes pop{40%{transform:scale(1.06)}}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(30px);
+  background:var(--basalt);color:var(--bg);font-family:var(--display);font-size:18px;padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.finish{position:fixed;inset:0;background:rgba(10,20,30,.55);display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-left,0px));z-index:20}
+.fbox{background:var(--card);border-radius:22px;padding:28px 22px;max-width:440px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.fbox .big{font-family:var(--display);font-size:30px;color:var(--sea);line-height:1.3;text-wrap:balance}
+.fbox .big b{color:var(--tangerine);font-weight:400}
+.fbox p{margin:0;line-height:1.6}
+.wave{font-size:13px;color:var(--muted)}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:21;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">1~4차시 정리하기 · 숨은 단어 8개</div>
+      <h1>요망진 AI와 <b>제주</b>지키기</h1>
+    </div>
+    <div class="score"><span id="cnt">0 / 8</span><div class="dots" id="dots"></div></div>
+  </header>
+
+  <div class="guide">👉 단어의 <b>첫 글자부터 끝 글자까지 손가락(마우스)으로 쭉 끌어</b> 보세요. 가로·세로로 숨어 있어요. 끌기가 어려우면 <b>첫 글자, 끝 글자를 차례로 콕콕</b> 눌러도 돼요.</div>
+
+  <div class="main">
+    <div class="boardbox">
+      <div class="board" id="board" aria-label="단어 찾기 글자판"></div>
+      <div class="tools">
+        <button id="hintBtn" class="primary">💡 힌트 보기</button>
+        <button id="resetBtn">다시 하기</button>
+      </div>
+    </div>
+    <div class="side">
+      <h2>찾은 단어 카드</h2>
+      <div class="cards" id="cards"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="finish" id="finish" hidden>
+  <div class="fbox">
+    <div style="font-size:54px">🍊🤖🌊</div>
+    <div class="big">8개 단어를<br><b>모두</b> 찾았어요!</div>
+    <p>1차시부터 4차시까지 배운 내용을 잘 기억하고 있네요.</p>
+    <p><b>여러분이 만들어 나가는 미래의 제주도 기대합니다</b></p>
+    <div class="wave">힌트 사용: <span id="hintUsed">0</span>번</div>
+    <button class="primary" id="againBtn">한 번 더 하기</button>
+  </div>
+</div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+const GRID = [
+  "문바퓨자율주행",
+  "인해양쓰레기제",
+  "공센터라호코주",
+  "지탄소중립코도",
+  "능하초트망틱안",
+  "변미재네어스녕",
+  "영드차코코보드",
+  "손론반가워코도"
+].map(r=>[...r]);
+const ROWS=GRID.length, COLS=GRID[0].length;
+
+const WORDS = [
+  {w:"자율주행",   c:"#e0524f", d:"사람이 운전하지 않아도 자동차가 스스로 주변을 살피며 달리는 기술"},
+  {w:"해양쓰레기", c:"#1f8fb8", d:"바다에 버려지거나 흘러든 쓰레기. 제주 바다와 바다 생물을 아프게 해요"},
+  {w:"인공지능",   c:"#7a5cc7", d:"사람처럼 보고, 배우고, 판단할 수 있게 만든 컴퓨터 기술"},
+  {w:"탄소중립",   c:"#2f9e5b", d:"내보낸 탄소만큼 줄이거나 흡수해서 합계를 0으로 만드는 것"},
+  {w:"제주도",     c:"#f28c1e", d:"우리가 AI와 함께 지키고 가꿔 나갈 섬"},
+  {w:"코코틱스",   c:"#c2477e", d:"수업에서 함께 사용한 코딩 교구"},
+  {w:"코코보드",   c:"#3d63c9", d:"코딩한 명령을 실행해 준 수업 보드"},
+  {w:"드론",       c:"#8a6d1f", d:"사람이 타지 않고 원격 조종이나 프로그램으로 나는 비행체"}
+];
+
+// 글자판에서 정답 위치 자동 계산 (가로·세로·대각, 정방향·역방향)
+const DIRS=[[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];
+function locate(word){
+  const L=[...word];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)for(const[dr,dc]of DIRS){
+    const cells=[];let ok=true;
+    for(let i=0;i<L.length;i++){const rr=r+dr*i,cc=c+dc*i;
+      if(rr<0||cc<0||rr>=ROWS||cc>=COLS||GRID[rr][cc]!==L[i]){ok=false;break}cells.push(rr*COLS+cc)}
+    if(ok)return cells;
+  }
+  return null;
+}
+WORDS.forEach(o=>{o.cells=locate(o.w);o.found=false});
+
+const board=document.getElementById('board'), cardsEl=document.getElementById('cards'),
+      dotsEl=document.getElementById('dots'), cnt=document.getElementById('cnt');
+let cellEls=[], hints=0;
+
+function build(){
+  board.innerHTML='';cellEls=[];
+  GRID.forEach((row,r)=>row.forEach((ch,c)=>{
+    const d=document.createElement('div');d.className='cell';d.textContent=ch;
+    d.dataset.i=r*COLS+c;d.tabIndex=0;d.setAttribute('role','button');
+    board.appendChild(d);cellEls.push(d);
+  }));
+  cardsEl.innerHTML='';dotsEl.innerHTML='';
+  WORDS.forEach((o,k)=>{
+    const card=document.createElement('div');card.className='wc';card.id='card'+k;
+    card.style.setProperty('--c',o.c);
+    card.innerHTML=`<div class="w">${'?'.repeat([...o.w].length).split('').join(' ')}</div><div class="d">아직 못 찾았어요</div>`;
+    cardsEl.appendChild(card);
+    const dot=document.createElement('div');dot.className='dot';dotsEl.appendChild(dot);
+  });
+}
+
+function lineCells(a,b){
+  const ar=Math.floor(a/COLS),ac=a%COLS,br=Math.floor(b/COLS),bc=b%COLS;
+  const dr=br-ar,dc=bc-ac;
+  if(!(dr===0||dc===0||Math.abs(dr)===Math.abs(dc)))return null;
+  const n=Math.max(Math.abs(dr),Math.abs(dc));const sr=Math.sign(dr),sc=Math.sign(dc);
+  const out=[];for(let i=0;i<=n;i++)out.push((ar+sr*i)*COLS+(ac+sc*i));return out;
+}
+function sameSet(x,y){return x.length===y.length&&(x.every((v,i)=>v===y[i])||x.every((v,i)=>v===y[y.length-1-i]))}
+
+function paintSel(cells){cellEls.forEach(e=>e.classList.remove('sel'));(cells||[]).forEach(i=>cellEls[i].classList.add('sel'))}
+
+function check(cells){
+  if(!cells||cells.length<2){return false}
+  const hit=WORDS.findIndex(o=>!o.found&&sameSet(o.cells,cells));
+  if(hit>=0){found(hit);return true}
+  const already=WORDS.find(o=>o.found&&sameSet(o.cells,cells));
+  if(already){toast('이미 찾은 단어예요!')}
+  else{cells.forEach(i=>{const e=cellEls[i];e.classList.remove('wrong');void e.offsetWidth;e.classList.add('wrong')});toast('앗, 다시 찾아볼까요?')}
+  return false;
+}
+
+function found(k){
+  const o=WORDS[k];o.found=true;
+  o.cells.forEach(i=>{const e=cellEls[i];e.classList.add('found');e.style.background=o.c});
+  const card=document.getElementById('card'+k);card.classList.add('done','pop');
+  card.innerHTML=`<div class="w">${o.w}</div><div class="d">${o.d}</div>`;
+  const n=WORDS.filter(x=>x.found).length;
+  cnt.textContent=n+' / 8';dotsEl.children[n-1].classList.add('on');
+  toast(['정답! ','잘했어요! ','찾았다! '][n%3]+o.w);
+  if(n===WORDS.length)setTimeout(finish,700);
+}
+
+// 끌기 + 콕콕 누르기
+let start=null,cur=null,dragging=false,tapStart=null;
+function cellAt(x,y){const el=document.elementFromPoint(x,y);return el&&el.classList.contains('cell')?+el.dataset.i:null}
+board.addEventListener('pointerdown',e=>{
+  const i=cellAt(e.clientX,e.clientY);if(i===null)return;
+  e.preventDefault();start=cur=i;dragging=true;paintSel([i]);
+});
+window.addEventListener('pointermove',e=>{
+  if(!dragging)return;const i=cellAt(e.clientX,e.clientY);if(i===null||i===cur)return;
+  cur=i;const l=lineCells(start,cur);if(l)paintSel(l);
+});
+window.addEventListener('pointerup',()=>{
+  if(!dragging)return;dragging=false;
+  if(cur===start){ // 탭
+    if(tapStart===null){tapStart=start;cellEls[start].classList.add('tap');paintSel([])}
+    else{const l=lineCells(tapStart,start);cellEls[tapStart].classList.remove('tap');
+      if(tapStart!==start){if(l)check(l);else toast('가로·세로로 이어진 글자를 골라요')}
+      tapStart=null;paintSel([])}
+  }else{
+    if(tapStart!==null){cellEls[tapStart].classList.remove('tap');tapStart=null}
+    const l=lineCells(start,cur);if(l)check(l);else toast('가로·세로로 곧게 끌어요');paintSel([]);
+  }
+  start=cur=null;
+});
+// 키보드: 엔터로 콕콕 누르기
+board.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;e.preventDefault();
+  const i=+e.target.dataset.i;
+  if(tapStart===null){tapStart=i;cellEls[i].classList.add('tap')}
+  else{cellEls[tapStart].classList.remove('tap');const l=lineCells(tapStart,i);if(tapStart!==i&&l)check(l);tapStart=null}
+});
+
+// 힌트: 못 찾은 단어 하나의 첫 글자를 깜빡이고 뜻을 보여줌
+document.getElementById('hintBtn').onclick=()=>{
+  const left=WORDS.map((o,k)=>[o,k]).filter(([o])=>!o.found);if(!left.length)return;
+  const [o,k]=left[Math.floor(Math.random()*left.length)];hints++;
+  const e=cellEls[o.cells[0]];e.classList.remove('hint');void e.offsetWidth;e.classList.add('hint');
+  const card=document.getElementById('card'+k);card.querySelector('.d').textContent='힌트: '+o.d;
+  card.classList.remove('pop');void card.offsetWidth;card.classList.add('pop');
+  toast('깜빡이는 글자에서 시작해요!');
+};
+
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1400)}
+
+function finish(){document.getElementById('hintUsed').textContent=hints;document.getElementById('finish').hidden=false;confetti()}
+function reset(){WORDS.forEach(o=>o.found=false);hints=0;tapStart=null;cnt.textContent='0 / 8';document.getElementById('finish').hidden=true;build()}
+document.getElementById('resetBtn').onclick=reset;
+document.getElementById('againBtn').onclick=reset;
+
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cv=document.getElementById('confetti');cv.hidden=false;const ctx=cv.getContext('2d');
+  cv.width=innerWidth;cv.height=innerHeight;
+  const cols=WORDS.map(o=>o.c);const P=Array.from({length:140},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height,
+    vy:2+Math.random()*3,vx:-1+Math.random()*2,s:6+Math.random()*6,c:cols[Math.floor(Math.random()*cols.length)],r:Math.random()*6}));
+  let f=0;(function step(){ctx.clearRect(0,0,cv.width,cv.height);
+    P.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.r+=.1;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);ctx.restore()});
+    if(++f<240)requestAnimationFrame(step);else{ctx.clearRect(0,0,cv.width,cv.height);cv.hidden=true}})();
+}
+
+build();
+</script>
+
+</body>
+</html>
