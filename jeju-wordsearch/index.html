@@ -30,12 +30,12 @@
   --bg:#11181d;--card:#1a242b;--line:#2d3d49;--muted:#9aaab6;--fg:#e8eef2;--ok:#5fcf8a;color-scheme:dark}
 
 *{box-sizing:border-box}
-html{font-size:clamp(15px,min(1.05vw,1.9vh),64px)}
+html{font-size:clamp(16px,0.55vw + 10px,24px)}
 html,body{margin:0}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:1rem;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
-.wrap{max-width:100%;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
 .eyebrow{font-size:0.875rem;color:var(--muted);letter-spacing:.04em}
 h1{font-family:var(--display);font-weight:400;font-size:clamp(1.7rem,4vw,2.6rem);margin:2px 0 0;line-height:1.15;text-wrap:balance;color:var(--sea)}
@@ -49,10 +49,10 @@ h1 b{color:var(--tangerine);font-weight:400}
 @media (max-width:760px){.main{grid-template-columns:1fr}}
 
 .boardbox{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px}
-.board{container-type:inline-size;max-width:calc((100vh - 15rem) * 7 / 8);min-width:min(100%,300px);margin:0 auto;display:grid;grid-template-columns:repeat(7,1fr);gap:clamp(4px,1cqi,40px);touch-action:none;user-select:none;-webkit-user-select:none}
+.board{container-type:inline-size;max-width:calc((100vh - 15rem) * 7 / 8);min-width:min(100%,300px);margin:0 auto;display:grid;grid-template-columns:repeat(7,1fr);gap:clamp(4px,1cqi,10px);touch-action:none;user-select:none;-webkit-user-select:none}
 .cell{aspect-ratio:1;max-width:100%;display:flex;align-items:center;justify-content:center;
-  font-family:var(--display);font-size:clamp(18px,7.2cqi,400px);color:var(--sea);
-  background:var(--bg);border-radius:clamp(8px,1.6cqi,60px);cursor:pointer;min-height:44px;transition:background .15s,color .15s,transform .15s}
+  font-family:var(--display);font-size:clamp(18px,7.2cqi,64px);color:var(--sea);
+  background:var(--bg);border-radius:clamp(8px,1.6cqi,16px);cursor:pointer;min-height:44px;transition:background .15s,color .15s,transform .15s}
 .cell.sel{background:var(--tangerine);color:#fff;transform:scale(1.06)}
 .cell.tap{outline:3px dashed var(--tangerine);outline-offset:-3px}
 .cell.found{color:#fff}
@@ -94,23 +94,6 @@ button:disabled{opacity:.45;cursor:default}
 .wave{font-size:0.8125rem;color:var(--muted)}
 canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:21;width:100%;height:100%}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-/* 노트북·PC: 왼쪽 글자판은 화면 높이 꽉 차게, 오른쪽에 제목·안내·카드 */
-@media (min-width:900px){
-  body{padding-block:14px}
-  .wrap{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto 1fr;
-    grid-template-areas:"board header" "board guide" "board side";column-gap:2rem;row-gap:1rem;align-items:start}
-  .main{display:contents}
-  header{grid-area:header}
-  .guide{grid-area:guide}
-  .boardbox{grid-area:board}
-  .side{grid-area:side}
-  .board{width:min(calc((100vh - 28px - 30px - 4.4rem) * 7 / 8), 60vw);max-width:none;min-width:0}
-  header{flex-direction:column;align-items:flex-start}
-  .guide{font-size:1.1rem}
-  .wc .w{font-size:1.6rem}
-  .wc .d{font-size:1.05rem}
-  .side h2{font-size:1.6rem}
-}
 </style>
 
 </head>
