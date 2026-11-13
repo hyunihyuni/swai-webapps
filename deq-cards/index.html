@@ -54,6 +54,8 @@ h1{font-family:var(--paper);font-size:1.55rem;margin:0;text-wrap:balance}
 .t-hv{color:var(--violet);border-color:var(--violet);background:var(--violet-soft)}
 .t-mm{color:var(--teal);border-color:var(--teal);background:var(--teal-soft)}
 .t-my{color:var(--green);border-color:var(--green);background:var(--green-soft)}
+.no{display:inline-block;min-width:2.1em;margin-right:6px;font-family:var(--ui);font-weight:700;font-size:.85rem;color:var(--blue);font-variant-numeric:tabular-nums}
+.ans{cursor:pointer}
 .clue{margin:0;font-family:var(--paper);font-weight:600;font-size:1.02rem;line-height:1.7;word-break:keep-all}
 .reveal{font:inherit;text-align:left;border:1.5px dashed var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:10px 12px;cursor:pointer;font-size:.92rem}
 .ans{border-left:3px solid var(--blue);background:var(--blue-soft);padding:9px 12px;border-radius:0 6px 6px 0}
@@ -92,6 +94,9 @@ footer{font-size:.82rem;color:var(--muted)}
   <div class="row">
     <button class="btn" id="hideDone">외운 카드 숨기기</button>
     <button class="btn" id="openAll">정답 모두 펼치기</button>
+    <button class="btn" id="clearOpen">펼친 정답 지우기</button>
+    <button class="btn" id="shuffle">순서 섞기</button>
+    <button class="btn" id="byNo">번호순</button>
     <button class="btn" id="tagGi">기출·후기·강사 강조만</button>
   </div>
 
@@ -129,8 +134,8 @@ const C=[
 [1,["hv","ju","mm"],"구매자가 낸 돈을 제3자가 맡아 두었다가 배송이 확인되면 판매자에게 주는 제도","에스크로 (결제대금예치제도)","강사: \"제일 많이 나오고 주관식으로도 많이 나옴\""],
 [1,["hv"],"사용자의 목표를 받아 일정 관리·자료 조사·요약·예약 같은 여러 작업을 스스로 계획하고 연속으로 수행하는 AI","AI 에이전트","쟁점: 통제 가능성, 책임 귀속, 인간 감독, 개인정보 접근 권한"],
 [1,["hv"],"가전·모바일·웨어러블 등 사물에 센서와 통신 기능을 달아, 사물끼리 또는 사람과 실시간으로 정보를 주고받게 하는 기술","사물인터넷 (IoT)","IoT 기반 응용 예: 스마트홈"],
-[1,["mm"],"익명성과 비대면성 때문에 온라인에서는 현실보다 감정·행동을 억제하는 힘이 약해지는 현상","(온라인) 탈억제 효과","익명성 → 책임 회피·악성댓글 / 비대면성 → 공감 약화·공격적 표현"],
-[1,["mm"],"ICT의 7가지 비도덕적 유혹을 제시한 학자. 그중 행위자와 피해 사이의 심리적 거리가 멀어지는 현상은?","리처드 루빈 / 도덕적 거리두기","7가지 유혹: 속도 · 프라이버시와 익명성 · 매체 특성 · 미적·기술적 매력 · 잠재적 피해자 증가 · 국제적 범위 · 파괴력"],
+[1,["mm"],"익명성과 비대면성 때문에 온라인에서는 감시받는 느낌이 줄어 감정과 행동의 절제가 풀리고, 현실보다 공격적·개방적으로 행동하게 되는 현상","(온라인) 탈억제 효과","익명성 → 책임 회피·악성댓글 / 비대면성 → 공감 약화·공격적 표현"],
+[1,["mm"],"ICT의 7가지 비도덕적 유혹을 제시한 학자. 그중 행위자가 자기 행동의 피해·결과·책임을 멀게 느끼게 되는 현상은?","리처드 루빈 / 도덕적 거리두기","7가지 유혹: 속도 · 프라이버시와 익명성 · 매체 특성 · 미적·기술적 매력 · 잠재적 피해자 증가 · 국제적 범위 · 파괴력"],
 [1,["mm"],"사이버 윤리 4원칙(자율성·해악금지·선행·정의)을 제시한 학자","리처드 A. 스피넬로","루빈(7가지 유혹)과 헷갈리지 않기"],
 [1,["mm"],"정보 윤리 4원리 (추병완)","존중 · 책임 · 정의 · 해악금지","스피넬로와 겹치는 것: 정의 · 해악금지"],
 [1,["mm"],"마이크 리블의 디지털 시민의식 3범주 (영문 앞글자 REP)","존중(Respect) · 교육(Educate) · 보호(Protect)","존중 = 접근·에티켓·권리와 책임 / 교육 = 의사소통·리터러시·상거래 / 보호 = 법·건강과 웰빙·보안"],
@@ -159,7 +164,7 @@ const C=[
 [2,["gi","my","mm"],"CCL 네 가지 조건을 영문 약어와 뜻으로","BY 저작자표시 · NC 비영리 · ND 변경금지 · SA 동일조건변경허락","아이콘을 보여 주고 묻는 문제가 나옴. CC BY-NC = 이름 표시하고 비영리로만"],
 [2,["hv"],"저작인격권 중, 저작물의 내용·형식·제목을 다른 사람이 함부로 바꾸거나 왜곡하지 못하게 할 권리","동일성유지권","저작인격권 3가지: 공표권 · 성명표시권 · 동일성유지권"],
 [2,["gi","hv","ju","mm"],"콘텐츠에 시청각적으로 알아챌 수 없는 저작권 정보를 삽입하는 기술","디지털 워터마킹","\"인지할 수 없는 정보 삽입\" → 워터마킹"],
-[2,["ju","mm"],"구매자 정보를 삽입해 불법 복제자를 추적하는 기술","포렌식 마킹","\"불법 복제자\", \"추적\" → 포렌식 마킹"],
+[2,["ju","mm"],"콘텐츠에 구매자(사용자) 정보를 삽입해 불법 유포자를 찾아내는 기술","포렌식 마킹","\"불법 복제자\", \"추적\" → 포렌식 마킹"],
 [2,[],"배포권과 대여권의 차이","배포권 = 대가와 무관(주로 무상) / 대여권 = 영리 목적","\"각각의 권리를 명확하게 구분할 수 있어야\""],
 
 [3,["mm"],"자신의 정보가 언제, 누구에게, 어디까지 알려지고 쓰일지 스스로 결정하고 통제할 수 있는 권리","자기정보 통제권 (개인정보 자기결정권)","프라이버시 보호의 핵심. 개인정보는 보호 '대상', 자기정보 통제권은 '권리'"],
@@ -182,7 +187,7 @@ const C=[
 [4,["gi","my"],"내담자의 말과 행동이 다르거나 회피할 때 존중하면서 그 불일치를 다루는 상담 기법","직면","반영 = 감정을 되돌려 줌 / 명료화 = 모호한 말을 분명하게 / 요약 = 핵심 정리"],
 [4,["gi","my"],"가네 9가지 수업사태의 1단계","주의 집중시키기 (주의 환기)","\"순서를 바꿔서 내는 경우가 있다\". 앞글자: 주목선내안수피평파"],
 [4,["gi","my"],"콜버그 도덕성 발달 3수준을 순서대로","전인습 → 인습 → 후인습","전인습 = 벌 회피·보상 / 인습 = 착한 아이·법과 질서 / 후인습 = 사회계약·보편 원리"],
-[4,["gi"],"가네가 제시한, 학습이 잘 일어나도록 교수자가 제공하는 9가지 외적 수업 절차를 이르는 말","수업 사태","가네(Gagné)의 9가지 수업사태. 1단계 = 주의 집중시키기"],
+[4,["gi"],"가네(Gagné)가 학습이 잘 일어나도록 교수자가 제공하는 9가지 외적 조건(주의 집중 → … → 파지 및 전이)을 이르는 말","수업 사태","가네(Gagné)의 9가지 수업사태. 1단계 = 주의 집중시키기"],
 [4,["gi"],"상담자와 내담자 사이의 신뢰와 친밀감. 상담을 시작할 때 가장 먼저 형성해야 하는 관계","라포 (Rapport)","상담 5대 기본 요건: 신뢰 · 수용 · 긍정적 존중 · 공감적 이해 · 솔직성"],
 [4,["gi"],"생활지도 활동 중, 상담·지도를 받은 학생이 이후 잘 적응하는지 사후에 계속 점검하고 돕는 활동","추수 활동","생활지도 5대 활동: 학생이해 → 정보제공 → 상담 → 정치(배치) → 추수"],
 [4,[],"ADDIE 모형 5단계 (\"이름과 순서 반드시 암기\")","분석 → 설계 → 개발 → 실행 → 평가",""],
@@ -196,6 +201,7 @@ const KEY="deq-last-v1";
 let done={}; try{done=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){done={}}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
 let area="all", hideDone=false, openAll=false, onlyGi=false;
+let order=C.map((_,i)=>i);
 const open={};
 const $=s=>document.getElementById(s);
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -207,7 +213,7 @@ function render(){
   const main=$("main"); main.textContent="";
   [1,2,3,4].forEach(a=>{
     if(area!=="all" && String(a)!==area) return;
-    const items=C.map((c,i)=>[c,i]).filter(([c,i])=>c[0]===a && !(hideDone&&done[i]) && !(onlyGi&&!c[1].some(t=>t==="gi"||t==="hv"||t==="mm")));
+    const items=order.map(i=>[C[i],i]).filter(([c,i])=>c[0]===a && !(hideDone&&done[i]) && !(onlyGi&&!c[1].some(t=>t==="gi"||t==="hv"||t==="mm")));
     const sec=document.createElement("section"); sec.className="area";
     sec.innerHTML='<h2>'+AREA[a][0]+'</h2><p class="sub">'+AREA[a][1]+' · 서답형 3문항</p>';
     const list=document.createElement("div"); list.className="list";
@@ -217,12 +223,13 @@ function render(){
       const tags=c[1].map(t=>'<span class="tg '+TAG[t][1]+'">'+TAG[t][0]+'</span>').join("");
       const shown=openAll||open[i];
       card.innerHTML=(tags?'<div class="tags">'+tags+'</div>':'')+
-        '<p class="clue">'+esc(c[2])+'</p>'+
-        (shown?'<div class="ans"><div class="k">'+esc(c[3])+'</div>'+(c[4]?'<div class="m">'+esc(c[4])+'</div>':'')+'</div>'
+        '<p class="clue"><span class="no">'+(i+1)+'.</span>'+esc(c[2])+'</p>'+
+        (shown?'<div class="ans" title="누르면 다시 가려져요"><div class="k">'+esc(c[3])+'</div>'+(c[4]?'<div class="m">'+esc(c[4])+'</div>':'')+'</div>'
               :'<button class="reveal" id="rv'+i+'">답을 떠올린 다음 눌러서 확인</button>')+
         '<div class="foot"><button class="chk" id="ck'+i+'">'+(done[i]?"✓ 외웠어요":"외웠어요")+'</button></div>';
       list.appendChild(card);
       const rv=card.querySelector(".reveal"); if(rv) rv.onclick=()=>{open[i]=true;render();};
+      const an=card.querySelector(".ans"); if(an && !openAll) an.onclick=()=>{delete open[i];render();};
       card.querySelector(".chk").onclick=()=>{done[i]=!done[i];save();render();};
     });
     sec.appendChild(list); main.appendChild(sec);
@@ -231,6 +238,9 @@ function render(){
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{area=b.dataset.a;document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();});
 $("hideDone").onclick=e=>{hideDone=!hideDone;e.currentTarget.classList.toggle("on",hideDone);render();};
 $("openAll").onclick=e=>{openAll=!openAll;e.currentTarget.classList.toggle("on",openAll);e.currentTarget.textContent=openAll?"정답 다시 가리기":"정답 모두 펼치기";if(!openAll)for(const k in open)delete open[k];render();};
+$("clearOpen").onclick=()=>{for(const k in open)delete open[k];if(openAll){openAll=false;const b=$("openAll");b.classList.remove("on");b.textContent="정답 모두 펼치기";}render();};
+$("shuffle").onclick=()=>{for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}$("shuffle").classList.add("on");$("shuffle").textContent="다시 섞기";render();window.scrollTo({top:$("main").offsetTop-10});};
+$("byNo").onclick=()=>{order=C.map((_,i)=>i);$("shuffle").classList.remove("on");$("shuffle").textContent="순서 섞기";render();};
 $("tagGi").onclick=e=>{onlyGi=!onlyGi;e.currentTarget.classList.toggle("on",onlyGi);render();};
 let armed=false;
 $("reset").onclick=e=>{const b=e.currentTarget;if(!armed){armed=true;b.textContent="한 번 더 누르면 지워져요";setTimeout(()=>{armed=false;b.textContent="체크 지우기"},4000);return;}done={};save();armed=false;b.textContent="체크 지우기";render();};
