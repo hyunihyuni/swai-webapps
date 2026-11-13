@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DEQ 막판 핵심 카드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@600;700&display=swap">
+<style>
+/* 레이아웃: 실무 4영역 탭 → 설명 카드(탭하면 정답) 한 줄씩. 외운 카드는 접힘 */
+:root{
+  --bg:#f1f4f9; --surface:#ffffff; --ink:#1b2333; --muted:#5f6a82; --line:#d3d9e6;
+  --blue:#2c4ba3; --blue-soft:#e6ecfb; --red:#d0312a; --red-soft:#fdeceb;
+  --gold:#a8690c; --gold-soft:#fbf1dc; --violet:#6b3fa0; --violet-soft:#f0e8fa; --green:#1f7a4d; --green-soft:#e3f3ea;
+  --ui:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --paper:"Noto Serif KR","Nanum Myeongjo","Batang",serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#11141b; --surface:#1a1f2b; --ink:#e7eaf2; --muted:#9aa3b8; --line:#2d3445;
+  --blue:#93abff; --blue-soft:#222b47; --red:#ff7168; --red-soft:#3a1f1f;
+  --gold:#e3b455; --gold-soft:#33290f; --violet:#c4a2f0; --violet-soft:#2a1d3d; --green:#5fd39a; --green-soft:#16301f; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#11141b; --surface:#1a1f2b; --ink:#e7eaf2; --muted:#9aa3b8; --line:#2d3445;
+  --blue:#93abff; --blue-soft:#222b47; --red:#ff7168; --red-soft:#3a1f1f;
+  --gold:#e3b455; --gold-soft:#33290f; --violet:#c4a2f0; --violet-soft:#2a1d3d; --green:#5fd39a; --green-soft:#16301f; color-scheme:dark }
+*{box-sizing:border-box}
+html,body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--paper);font-size:1.55rem;margin:0;text-wrap:balance}
+.lead{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.goal{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--red);padding:12px 14px;font-size:.93rem}
+.goal b{color:var(--red)}
+.bar{display:flex;align-items:center;gap:10px;font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.fill{height:100%;background:var(--green);width:0;transition:width .3s}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab,.btn{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:var(--surface);font-weight:600}
+.btn.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.area h2{font-family:var(--paper);font-size:1.15rem;margin:8px 0 2px}
+.area .sub{font-size:.85rem;color:var(--muted);margin:0 0 10px}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.card.done{opacity:.55}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tg{font-size:.72rem;font-weight:600;padding:1px 7px;border-radius:4px;border:1px solid}
+.t-gi{color:var(--red);border-color:var(--red);background:var(--red-soft)}
+.t-ju{color:var(--gold);border-color:var(--gold);background:var(--gold-soft)}
+.t-sa{color:var(--blue);border-color:var(--blue);background:var(--blue-soft)}
+.t-hv{color:var(--violet);border-color:var(--violet);background:var(--violet-soft)}
+.t-my{color:var(--green);border-color:var(--green);background:var(--green-soft)}
+.clue{margin:0;font-family:var(--paper);font-weight:600;font-size:1.02rem;line-height:1.7;word-break:keep-all}
+.reveal{font:inherit;text-align:left;border:1.5px dashed var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:10px 12px;cursor:pointer;font-size:.92rem}
+.ans{border-left:3px solid var(--blue);background:var(--blue-soft);padding:9px 12px;border-radius:0 6px 6px 0}
+.ans .k{font-weight:700;font-size:1.08rem;word-break:keep-all}
+.ans .m{font-size:.86rem;color:var(--muted);margin-top:3px;word-break:keep-all}
+.foot{display:flex;justify-content:flex-end}
+.chk{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:16px;padding:5px 12px;cursor:pointer}
+.card.done .chk{background:var(--green);border-color:var(--green);color:var(--surface);font-weight:600}
+.trap{background:var(--surface);border:1px solid var(--line);padding:14px 16px}
+.trap h2{font-family:var(--paper);font-size:1.1rem;margin:0 0 8px}
+.trap ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.trap b{color:var(--red)}
+.empty{color:var(--muted);font-size:.92rem;margin:0}
+footer{font-size:.82rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>DEQ 막판 핵심 카드</h1>
+    <p class="lead">기출 2회분의 서답형 정답과 강사가 "기출"·"주관식으로 나온다"고 짚은 것, 올해 샘플 서답형, 8월 응시 후기에 나온 용어를 모았습니다. 빨간 "기출 정답"과 보라 "8월 응시 후기" 카드는 꼭 보세요. 설명을 읽고 답을 떠올린 다음 카드를 눌러 확인하세요.</p>
+  </header>
+
+  <div class="goal">합격까지 필요한 건 <b>서답형 3~4개</b>입니다. 카드를 전부 외우지 않아도 됩니다. 영역마다 확실한 것 하나씩만 만들어도 충분해요.</div>
+
+  <div class="bar"><span id="cnt">0 / 0 외움</span><div class="track"><div class="fill" id="fill"></div></div></div>
+
+  <div class="tabs" role="group" aria-label="영역">
+    <button class="tab" data-a="all" aria-pressed="true">전체</button>
+    <button class="tab" data-a="1" aria-pressed="false">① 신기술·AI</button>
+    <button class="tab" data-a="2" aria-pressed="false">② 역기능</button>
+    <button class="tab" data-a="3" aria-pressed="false">③ 정보보호</button>
+    <button class="tab" data-a="4" aria-pressed="false">④ 교육·상담</button>
+  </div>
+  <div class="row">
+    <button class="btn" id="hideDone">외운 카드 숨기기</button>
+    <button class="btn" id="openAll">정답 모두 펼치기</button>
+    <button class="btn" id="tagGi">기출·후기만</button>
+  </div>
+
+  <main id="main"></main>
+
+  <section class="trap">
+    <h2>객관식 함정 (강사가 "이러면 틀린 것"이라고 한 말)</h2>
+    <ul>
+      <li>"기존 윤리는 필요 없다 / 폐기한다" → <b>틀림</b>. 기존 윤리를 포함해 확장한 것.</li>
+      <li>청소년에게 "강제로 규칙을 정해 준다" → <b>틀림</b>. 청소년은 스스로 조절 방법을 찾게 함. 영유아는 부모가 직접 정함.</li>
+      <li>게임시간선택제 "만 16세 미만" → <b>틀림</b>. 선택제는 만 18세 미만, 셧다운제가 만 16세 미만(폐지).</li>
+      <li>상담 기관: 스마트쉼센터 · 한국청소년상담복지개발원(1388) · 서울시 아이윌센터. 낯선 "복지센터"가 나오면 <b>오답</b>.</li>
+      <li>"글자가 갑자기 일본어·영어로 바뀐다" → 악성코드 증상 <b>아님</b>(단축키 실수).</li>
+      <li>학교 교육·시험문제용 복제는 저작재산권 제한(허용). 학원 강사가 영리 교재에 쓰는 건 <b>안 됨</b>.</li>
+      <li>OECD 공개 원칙 = 개인정보를 공개하라는 것이 <b>아님</b>. 처리방침·처리자 연락처를 공개하라는 것.</li>
+      <li>"가장 중요하다", "반드시 삭제해야 한다"처럼 과한 말, 나이·기간·개수를 바꾼 선지를 의심하세요.</li>
+    </ul>
+  </section>
+
+  <footer>체크 기록은 이 기기의 브라우저에만 저장됩니다. <button class="btn" id="reset">체크 지우기</button></footer>
+</div>
+
+<script>
+const AREA={1:["① 디지털·신기술 활용","AI 용어, 전자상거래, 전자정부"],2:["② 역기능 예방·대응","과의존, 저작권"],3:["③ 정보보호 기술","개인정보, 보안 3요소, 악성코드"],4:["④ 교육 및 상담 실무","교수 설계, 상담 기법, 발달 이론"]};
+const TAG={gi:["기출 정답","t-gi"],ju:["주관식 언급","t-ju"],sa:["샘플 서답형","t-sa"],my:["내가 틀린 것","t-my"],hv:["8월 응시 후기","t-hv"]};
+// [영역, 태그들, 설명(문제), 정답, 함께 외울 것]
+const C=[
+[1,["gi","sa","my"],"AI가 사실이 아닌 내용을 사실인 것처럼 자신 있게 만들어 낸다. 없는 논문 인용, 허위 통계.","AI 할루시네이션","생성형 AI 4대 위험: 할루시네이션 · 편향 · 지식재산권 · 개인정보 (\"진짜 시험에 많이 나옴\")"],
+[1,["sa"],"AI가 성별·인종·연령 등 특정 집단에 불공정한 결과를 계속 낸다. 원인은 편향된 학습 데이터.","AI 편향 (Bias)",""],
+[1,["gi","sa","my"],"AI 대출 심사에서 거절된 사람이 \"왜 거절됐는지\" 이유를 요구할 수 있는 원칙","설명가능성 (Explainability)","짝: 투명성"],
+[1,["sa"],"의사가 AI 진단 결과를 검토하지 않고 그대로 통보했다가 오진이 났다. 지키지 않은 원칙은?","인간 검토","최종 판단과 책임은 사람에게 있음"],
+[1,["sa"],"《스노 크래시》에 처음 나온 3차원 가상세계. '가상·초월' + '우주'의 합성어","메타버스",""],
+[1,["gi","my"],"추천 알고리즘이 비슷한 의견만 계속 보여 줘서 걸러진 정보 안에 갇히는 현상","필터버블","확증편향을 강화함"],
+[1,["gi","my"],"네티즌 + 매카시즘. 온라인에서 신상을 털고 집단으로 비방하는 마녀사냥","네카시즘",""],
+[1,["hv","ju"],"구매자가 낸 돈을 제3자가 맡아 두었다가 배송이 확인되면 판매자에게 주는 제도","에스크로 (결제대금예치제도)","강사: \"제일 많이 나오고 주관식으로도 많이 나옴\""],
+[1,["hv"],"사용자의 목표를 받아 일정 관리·자료 조사·요약·예약 같은 여러 작업을 스스로 계획하고 연속으로 수행하는 AI","AI 에이전트","쟁점: 통제 가능성, 책임 귀속, 인간 감독, 개인정보 접근 권한"],
+[1,["hv"],"가전·모바일·웨어러블 등 사물에 센서와 통신 기능을 달아, 사물끼리 또는 사람과 실시간으로 정보를 주고받게 하는 기술","사물인터넷 (IoT)","IoT 기반 응용 예: 스마트홈"],
+[1,["ju"],"구매안전서비스 3가지 제도를 모두 쓰시오.","에스크로 · 소비자피해보상보험 · 채무지급보증계약","소비자피해보상보험도 \"주관식으로 종종 나옴\""],
+[1,["hv"],"\"전자 신분증\" 느낌의 인증 수단 / \"주민등록번호 대체\" 식별 수단","공동인증서 / 아이핀(I-PIN)","공동인증서 = 전자서명"],
+[1,["gi"],"정부24에서, 나와 가족이 받을 수 있는 정부 지원금·복지 혜택을 맞춤형으로 확인하는 서비스","보조금24","\"국가에서 제공하는 서비스는 일부러 꼭 들어간다\""],
+[1,["gi"],"교통범칙금 사이트(이파인)에서 조회·납부할 수 없는 것","벌금","범칙금·과태료는 가능. 벌금은 법원이 선고하는 형벌"],
+[1,["gi"],"일반 검색엔진으로는 찾을 수 없고 토르(Tor) 같은 특수 브라우저로만 접속하는 숨겨진 웹. 불법 거래나 유출된 개인정보가 유통됨","다크웹 (Dark Web)","딥웹 = 검색엔진에 안 잡히는 웹 전체(로그인 페이지 등) / 다크웹 = 그중 특수 브라우저로만 들어가는 익명 영역"],
+[1,["gi"],"인터넷과 디지털 기기를 쓰면서 남기는 온라인 흔적. 평판·사생활·개인정보 보호에 영향을 줌","디지털 발자국 (Digital Footprint)","교재 1장 \"더 알아보기\"에 나온 용어"],
+
+[2,["sa","ju"],"스마트폰 과의존 3요소를 쓰시오.","현저성 · 조절실패 · 문제적 결과","짝: 중독 = 내성 · 금단 · 일상생활 장애. 과의존이 시험에 더 많이 나옴"],
+[2,["sa"],"스마트폰을 잠깐 내려놓아도 심하게 불안·초조하다. 스마트폰이 생활의 중심이 됨","현저성",""],
+[2,["gi","my"],"과의존 3요소 중, 사용을 시작하면 스스로 멈추지 못하는 것","조절실패","짝: 내성과 금단은 조절실패와 가장 관련 깊음(샘플 객관식)"],
+[2,[],"치료나 상담이 필요한 상태의 스마트폰 사용자군","고위험 사용자군","일반 → 잠재적 위험 → 고위험"],
+[2,["ju"],"청소년 본인이나 부모가 게임 이용 시간대를 신청하는 제도 (만 18세 미만, 문체부)","게임시간선택제","셧다운제 = 만 16세 미만, 여가부, 폐지"],
+[2,["hv","ju"],"인터넷·스마트폰 과의존 예방 교육과 상담을 하는 국가 기관","스마트쉼센터","1599-0075 · 한국지능정보사회진흥원(NIA)"],
+[2,["sa"],"저작자의 정신적 권리. 양도·상속이 안 되고 사망하면 소멸한다. 세 가지 권리를 포함","저작인격권: 공표권 · 성명표시권 · 동일성유지권","짝: 저작재산권은 양도 가능"],
+[2,["gi","my"],"CCL 네 가지 조건을 영문 약어와 뜻으로","BY 저작자표시 · NC 비영리 · ND 변경금지 · SA 동일조건변경허락","아이콘을 보여 주고 묻는 문제가 나옴. CC BY-NC = 이름 표시하고 비영리로만"],
+[2,["hv"],"저작인격권 중, 저작물의 내용·형식·제목을 다른 사람이 함부로 바꾸거나 왜곡하지 못하게 할 권리","동일성유지권","저작인격권 3가지: 공표권 · 성명표시권 · 동일성유지권"],
+[2,["gi","hv","ju"],"콘텐츠에 시청각적으로 알아챌 수 없는 저작권 정보를 삽입하는 기술","디지털 워터마킹","\"인지할 수 없는 정보 삽입\" → 워터마킹"],
+[2,["ju"],"구매자 정보를 삽입해 불법 복제자를 추적하는 기술","포렌식 마킹","\"불법 복제자\", \"추적\" → 포렌식 마킹"],
+[2,[],"배포권과 대여권의 차이","배포권 = 대가와 무관(주로 무상) / 대여권 = 영리 목적","\"각각의 권리를 명확하게 구분할 수 있어야\""],
+
+[3,["sa"],"보유기간이 지나거나 목적을 달성한 개인정보를 복구되지 않게 완전히 삭제하는 단계","파기","생명주기: 수집 → 이용·제공 → 보관 → 파기"],
+[3,["gi","sa"],"추가정보 없이는 누군지 모르지만, 추가정보가 있으면 다시 알아볼 수 있게 처리한 정보 (홍길동 → 홍○○)","가명정보","익명정보 = 절대 복원 불가 → 보호 대상 아님"],
+[3,["gi","ju","my"],"정보보안 3요소 (CIA)","기밀성 · 무결성 · 가용성","유출 → 기밀성 침해 / 바꿔치기 → 무결성 침해 / 쓰지 못함 → 가용성 침해"],
+[3,["gi","my"],"원래 있던 데이터의 내용을 바꾸는 위협 / 없던 데이터를 진짜처럼 만들어 내는 위협","변조 / 위조","둘 다 무결성 침해"],
+[3,["gi","ju"],"조직의 정보보호 관리체계가 인증 기준에 맞는지 인증하는 제도. 개인정보까지 포함하면?","ISMS / ISMS-P","정보보호 관리체계 (작년 주관식 기출)"],
+[3,["gi"],"\"아무도 믿지 말고 항상 검증하라\". 내부망·외부망을 구분하지 않고 모든 사용자와 기기의 접근을 매번 확인하는 보안 모델","제로트러스트 (Zero Trust)","기존 방식 = 내부는 믿고 외부만 막음(경계 보안) / 제로트러스트 = 내부도 믿지 않음"],
+[3,["hv","ju"],"파일을 암호화해 인질로 잡고 돈을 요구하는 악성코드","랜섬웨어","\"주관식으로도 너무 자주 나와요\""],
+[3,["gi","hv","ju"],"개인정보침해 신고센터 전화번호","118","불법·유해정보 신고는 1377"],
+[3,["gi"],"웹사이트 맨 아래 '개인정보 처리방침' 화면을 보여 준다. OECD 8원칙 중 무엇?","공개 원칙","꼭 알 세 개: 공개 · 정보정확성(최신 상태 유지) · 목적명확화"],
+[3,[],"정보주체의 권리 (매년 거의 나옴)","열람 · 정정·삭제 · 처리정지 · 동의철회",""],
+[3,["hv"],"QR코드 + 피싱. QR코드를 찍게 해 악성 앱 설치나 가짜 사이트 접속을 유도하는 수법","큐싱 (Qshing)","피싱 가족: 스미싱(문자) · 큐싱(QR) · 파밍(가짜 사이트) · 보이스피싱(전화)"],
+[3,["gi","my"],"특정 개인·조직을 노린 맞춤형 피싱 / 문자 링크로 악성 앱 설치 / 정상 주소를 입력해도 가짜 사이트로","스피어피싱 / 스미싱 / 파밍","메모리 해킹 = 정상 사이트인데 오류 팝업이 뜨며 보안카드 번호 전체 입력 요구"],
+[3,[],"\"실행파일\", \"기생\", \"숙주\"가 나오는 악성코드","컴퓨터 바이러스","웜 = 숙주 없이 스스로 전파 / 트로이목마 = 정상 프로그램으로 위장, 자기복제 안 함"],
+
+[4,["sa"],"\"가짜뉴스를 보고 팩트체크 모델을 적용해 사실 여부를 판별할 수 있다\"는 블룸의 어느 수준?","적용 (응용)","기억 → 이해 → 적용 → 분석 → 평가 → 창조"],
+[4,["gi","my"],"내담자의 말과 행동이 다르거나 회피할 때 존중하면서 그 불일치를 다루는 상담 기법","직면","반영 = 감정을 되돌려 줌 / 명료화 = 모호한 말을 분명하게 / 요약 = 핵심 정리"],
+[4,["gi","my"],"가네 9가지 수업사태의 1단계","주의 집중시키기 (주의 환기)","\"순서를 바꿔서 내는 경우가 있다\". 앞글자: 주목선내안수피평파"],
+[4,["gi","my"],"콜버그 도덕성 발달 3수준을 순서대로","전인습 → 인습 → 후인습","전인습 = 벌 회피·보상 / 인습 = 착한 아이·법과 질서 / 후인습 = 사회계약·보편 원리"],
+[4,["gi"],"가네가 제시한, 학습이 잘 일어나도록 교수자가 제공하는 9가지 외적 수업 절차를 이르는 말","수업 사태","가네(Gagné)의 9가지 수업사태. 1단계 = 주의 집중시키기"],
+[4,["gi"],"상담자와 내담자 사이의 신뢰와 친밀감. 상담을 시작할 때 가장 먼저 형성해야 하는 관계","라포 (Rapport)","상담 5대 기본 요건: 신뢰 · 수용 · 긍정적 존중 · 공감적 이해 · 솔직성"],
+[4,["gi"],"생활지도 활동 중, 상담·지도를 받은 학생이 이후 잘 적응하는지 사후에 계속 점검하고 돕는 활동","추수 활동","생활지도 5대 활동: 학생이해 → 정보제공 → 상담 → 정치(배치) → 추수"],
+[4,[],"ADDIE 모형 5단계 (\"이름과 순서 반드시 암기\")","분석 → 설계 → 개발 → 실행 → 평가",""],
+[4,[],"켈러의 ARCS 동기 설계 4요소","주의집중 · 관련성 · 자신감 · 만족감",""],
+[4,["sa"],"윤리적 딜레마 상황에서 학습자가 스스로 판단하고 성찰하도록 이끄는 교수자의 역할","촉진자 (퍼실리테이터)",""],
+[4,["hv"],"방어기제 중, 받아들이기 어려운 행동이나 실패를 그럴듯한 이유를 붙여 정당화하는 것 (예: 못 딴 포도를 \"신 포도\"라고 함)","합리화","짝: 투사 = 내 감정·욕구를 남 탓으로 / 억압 = 의식 밖으로 밀어냄 / 승화 = 바람직한 방향으로 전환 / 퇴행 = 어린 시절 방식으로"],
+[4,["hv"],"응집력 강한 집단에서 비판이 억제돼 잘못된 결정 / 같은 성향끼리 논의하다 더 극단으로","집단사고 / 집단극화",""]
+];
+
+const KEY="deq-last-v1";
+let done={}; try{done=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){done={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
+let area="all", hideDone=false, openAll=false, onlyGi=false;
+const open={};
+const $=s=>document.getElementById(s);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(){
+  const n=Object.keys(done).filter(k=>done[k]).length;
+  $("cnt").textContent=n+" / "+C.length+" 외움";
+  $("fill").style.width=(n/C.length*100)+"%";
+  const main=$("main"); main.textContent="";
+  [1,2,3,4].forEach(a=>{
+    if(area!=="all" && String(a)!==area) return;
+    const items=C.map((c,i)=>[c,i]).filter(([c,i])=>c[0]===a && !(hideDone&&done[i]) && !(onlyGi&&!c[1].includes("gi")&&!c[1].includes("hv")));
+    const sec=document.createElement("section"); sec.className="area";
+    sec.innerHTML='<h2>'+AREA[a][0]+'</h2><p class="sub">'+AREA[a][1]+' · 서답형 3문항</p>';
+    const list=document.createElement("div"); list.className="list";
+    if(!items.length){ const p=document.createElement("p"); p.className="empty"; p.textContent=onlyGi?"이 영역에는 기출·후기 카드가 없어요.":"이 영역 카드를 모두 외웠어요."; list.appendChild(p); }
+    items.forEach(([c,i])=>{
+      const card=document.createElement("article"); card.className="card"+(done[i]?" done":"");
+      const tags=c[1].map(t=>'<span class="tg '+TAG[t][1]+'">'+TAG[t][0]+'</span>').join("");
+      const shown=openAll||open[i];
+      card.innerHTML=(tags?'<div class="tags">'+tags+'</div>':'')+
+        '<p class="clue">'+esc(c[2])+'</p>'+
+        (shown?'<div class="ans"><div class="k">'+esc(c[3])+'</div>'+(c[4]?'<div class="m">'+esc(c[4])+'</div>':'')+'</div>'
+              :'<button class="reveal" id="rv'+i+'">답을 떠올린 다음 눌러서 확인</button>')+
+        '<div class="foot"><button class="chk" id="ck'+i+'">'+(done[i]?"✓ 외웠어요":"외웠어요")+'</button></div>';
+      list.appendChild(card);
+      const rv=card.querySelector(".reveal"); if(rv) rv.onclick=()=>{open[i]=true;render();};
+      card.querySelector(".chk").onclick=()=>{done[i]=!done[i];save();render();};
+    });
+    sec.appendChild(list); main.appendChild(sec);
+  });
+}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{area=b.dataset.a;document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();});
+$("hideDone").onclick=e=>{hideDone=!hideDone;e.currentTarget.classList.toggle("on",hideDone);render();};
+$("openAll").onclick=e=>{openAll=!openAll;e.currentTarget.classList.toggle("on",openAll);e.currentTarget.textContent=openAll?"정답 다시 가리기":"정답 모두 펼치기";if(!openAll)for(const k in open)delete open[k];render();};
+$("tagGi").onclick=e=>{onlyGi=!onlyGi;e.currentTarget.classList.toggle("on",onlyGi);render();};
+let armed=false;
+$("reset").onclick=e=>{const b=e.currentTarget;if(!armed){armed=true;b.textContent="한 번 더 누르면 지워져요";setTimeout(()=>{armed=false;b.textContent="체크 지우기"},4000);return;}done={};save();armed=false;b.textContent="체크 지우기";render();};
+render();
+</script>
+</body>
+</html>
